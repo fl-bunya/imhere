@@ -30,7 +30,7 @@ app.get('/', async (c) => {
     longitude: geoData?.longitude,
     name: 'IP',
     label: 'IP',
-    color: 'red'
+    color: 'gold'
   })
 
   // JSXコンポーネントを使ってレンダリング

@@ -96,7 +96,7 @@ function initializeMap(locations) {
  */
 async function getCurrentPosition() {
   const options = {
-    enableHighAccuracy: true,
+    enableHighAccuracy: false,
     timeout: 5000,
     maximumAge: 0,
   };
