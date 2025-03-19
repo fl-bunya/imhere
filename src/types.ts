@@ -1,6 +1,11 @@
-/**
- * IPジオロケーションデータの型定義
- */
+export type Location = {
+  latitude: number | unknown;
+  longitude: number | unknown;
+  name: string;
+  label?: string;
+  color?: string;
+};
+
 export interface IPGeoData {
   ip: string;
   city?: string;

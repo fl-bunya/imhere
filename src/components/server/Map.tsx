@@ -1,16 +1,12 @@
-/** @jsxImportSource hono/jsx */
 import { type FC, Fragment } from 'hono/jsx';
-import type { IPGeoData } from '../../types/geolocation';
+import type { Locations } from '../../types';
 
 type MapProps = {
-  clientIP: string;
-  geoData: IPGeoData;
-  latitude: number;
-  longitude: number;
+  locations: Locations;
 };
 
 // JSXコンポーネント（Honoのサーバーサイドレンダリングで使用）
-export const Map: FC<MapProps> = ({ clientIP, geoData, latitude, longitude }) => {
+export const Map: FC<MapProps> = ({ locations }) => {
   return (
     <Fragment>
       <div id="map"></div>
@@ -18,10 +14,7 @@ export const Map: FC<MapProps> = ({ clientIP, geoData, latitude, longitude }) =>
       <script dangerouslySetInnerHTML={{
         __html: `
         // サーバーサイドから渡されたデータをグローバル変数として定義
-        window.serverGeoData = ${JSON.stringify(geoData)};
-        window.clientIP = "${clientIP}";
-        window.latitude = ${latitude};
-        window.longitude = ${longitude};
+        window.locations = ${JSON.stringify(locations)};
         `
       }}></script>
       <script src="/map.js"></script>
