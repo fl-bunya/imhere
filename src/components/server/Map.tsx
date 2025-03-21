@@ -1,12 +1,12 @@
 import { type FC, Fragment } from 'hono/jsx';
-import type { Locations } from '../../types';
+import type { Location } from '../../types';
 
 type MapProps = {
-  locations: Locations;
+  location: Location;
 };
 
 // JSXコンポーネント（Honoのサーバーサイドレンダリングで使用）
-export const Map: FC<MapProps> = ({ locations }) => {
+export const Map: FC<MapProps> = ({ location }) => {
   return (
     <Fragment>
       <div id="map"></div>
@@ -14,7 +14,7 @@ export const Map: FC<MapProps> = ({ locations }) => {
       <script dangerouslySetInnerHTML={{
         __html: `
         // サーバーサイドから渡されたデータをグローバル変数として定義
-        window.locations = ${JSON.stringify(locations)};
+        window.myLocation = ${JSON.stringify(location)};
         `
       }}></script>
       <script src="/map.js"></script>

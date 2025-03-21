@@ -6,7 +6,14 @@
   "assets": {
     "directory": "./public",
     "binding": "ASSETS"
-  }
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "d1-imhere",
+      "database_id": "99ec6157-6271-45be-bdf1-c47f2afd48f6"
+    }
+  ]
   // "compatibility_flags": [
   //   "nodejs_compat"
   // ],

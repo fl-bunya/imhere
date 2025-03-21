@@ -1,10 +1,10 @@
 // 地図の初期化処理を行う関数
-function initializeMap(locations) {
+function initializeMap(location) {
   const mapElement = document.getElementById('map');
   if (!mapElement) return;
   
   try {
-    if (!locations || !Array.isArray(locations) || locations.length === 0) {
+    if (!location) {
       throw new Error('位置情報データが見つかりません');
     }
     
@@ -30,28 +30,20 @@ function initializeMap(locations) {
       });
     }
 
-    // 各位置にマーカーを追加
-    locations.forEach((location) => {
-      const lat = location.latitude;
-      const lng = location.longitude;
-      const info = location.info || null;
-      const color = location.color || 'blue'; // デフォルトは青
-      
-      if (lat === undefined || lng === undefined) {
-        console.warn('マーカーの位置情報が不完全です', location);
-        return; // この位置はスキップ
+    function createMarker(lat, lng, info, color) {
+      if (!lat || !lng) {
+        console.warn('マーカーの位置情報が不完全です', lat, lng);
+        return;
       }
       
       // 境界ボックスに位置を追加
       bounds.extend([lat, lng]);
       
       // マーカーを追加
-      const popupContent = info 
-        ? `位置情報: ${info.city || '不明'}, ${info.region || '不明'}, ${info.country_name || '不明'}`
-        : location.label || '位置情報';
+      const popupContent = info;
       
       // 各マーカーに一意のポップアップを割り当て
-      const popup = L.popup().setContent(popupContent);
+      const popup = L.popup().setContent(info);
       
       // 色付きマーカーを作成
       const coloredIcon = createColoredMarkerIcon(color);
@@ -60,7 +52,11 @@ function initializeMap(locations) {
         .addTo(map)
         .bindPopup(popupContent)
         .openPopup();
-    });
+    }
+
+    createMarker(location.browser.lat, location.browser.lng, 'You', 'blue');
+    createMarker(location.ip.lat, location.ip.lng, 'IP', 'gold');
+    createMarker(location.cf.lat, location.cf.lng, `Cloudflare: ${location.cf.colo}`, 'orange');
     
     // 地図の表示範囲を調整して全てのマーカーを表示
     if (bounds.isValid()) {
@@ -150,26 +146,21 @@ async function getCurrentPosition() {
 // ページ読み込み時に実行
 document.addEventListener('DOMContentLoaded', async () => {
   // IP, Cloudflare位置を取得
-  const locations = window.locations;
+  const location = window.myLocation;
 
   try {
-
     // ユーザーの現在位置を取得
     const position = await getCurrentPosition();
-    locations.push({
-      latitude: position.latitude,
-      longitude: position.longitude,
-      name: '現在地',
-      label: '現在地',
-      color: 'blue'
-    })
+    location.browser = {
+      lat: position.latitude,
+      lng: position.longitude,
+    }
     
-    // 複数のピンを表示
-    initializeMap(locations);
+    initializeMap(location);
     
   } catch (error) {
     console.error('位置情報の取得に失敗しました:', error);
     
-    initializeMap(locations);
+    initializeMap(location);
   }
 }); 

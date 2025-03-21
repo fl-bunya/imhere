@@ -1,19 +1,24 @@
 /** @jsxImportSource hono/jsx */
 import { type FC } from 'hono/jsx';
 import { Layout } from './Layout';
-import { IpInfo } from './IpInfo';
 import { Map } from './Map';
-import type { Location } from '../../types';
+import { Locations } from './Locations';
+import { LocationForm } from './LocationForm';
+import type { Location, LocationRecord } from '../../types';
 
 type HomePageProps = {
-  locations: Location[];
+  currentLocation: Location;
+  savedLocations: LocationRecord[];
 };
 
-export const HomePage: FC<HomePageProps> = ({ locations }) => {
+export const HomePage: FC<HomePageProps> = ({ currentLocation, savedLocations }) => {
   return (
     <Layout title="現在地表示 - IP Geolocation">
-      {/* <IpInfo clientIP={clientIP} locationInfo={`${geoData.city || '不明'}, ${geoData.region || '不明'}, ${geoData.country_name || '不明'}`} /> */}
-      <Map locations={locations} />
+      <Map location={currentLocation} />
+      
+      <LocationForm currentLocation={currentLocation} />
+      
+      <Locations savedLocations={savedLocations} />
     </Layout>
   );
 }; 

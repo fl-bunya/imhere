@@ -1,4 +1,4 @@
-import type { IPGeoData } from '../types/geolocation';
+import type { IPGeoData } from '../types';
 
 /**
  * IPジオロケーションAPIを使用して位置情報を取得するサービス
