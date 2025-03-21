@@ -16,9 +16,11 @@ export const HomePage: FC<HomePageProps> = ({ currentLocation, savedLocations })
     <Layout title="現在地表示 - IP Geolocation">
       <Map location={currentLocation} />
       
-      <LocationForm currentLocation={currentLocation} />
-      
-      <Locations savedLocations={savedLocations} />
+      <div className="padded-content" style={{ marginTop: '360px' }}>
+        <LocationForm currentLocation={currentLocation} />
+        
+        <Locations savedLocations={savedLocations} />
+      </div>
     </Layout>
   );
 }; 

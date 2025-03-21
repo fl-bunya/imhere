@@ -38,7 +38,6 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
       <style jsx>{`
         .form-container {
           width: 100%;
-          max-width: 800px;
           margin-top: 2rem;
           padding: 1.5rem;
           background-color: #f8f9fa;

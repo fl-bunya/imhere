@@ -15,34 +15,57 @@ export const Layout: FC<LayoutProps> = ({ children, title }) => {
         <title>{title}</title>
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
         <style>{`
-          body { 
-            font-family: Arial, sans-serif;
+          * {
+            box-sizing: border-box;
+          }
+          html, body { 
             margin: 0;
             padding: 0;
+            width: 100%;
+            overflow-x: hidden;
+          }
+          body { 
+            font-family: Arial, sans-serif;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            padding-top: 60px; /* ヘッダーの高さ分のパディングを追加 */
           }
           header {
             background-color: #4a89dc;
             color: white;
             padding: 1rem;
             text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 300; /* 他の要素より前面に */
+            width: 100%;
+            height: 60px; /* 高さを固定 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          header h1 {
+            margin: 0;
+            font-size: 1.5rem;
           }
           main {
             flex-grow: 1;
-            padding: 1rem;
+            padding: 0;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            align-items: stretch;
+            width: 100%;
+          }
+          .padded-content {
+            padding: 1rem 2rem;
+            width: 100%;
+            box-sizing: border-box;
           }
           #map {
             width: 100%;
-            height: 400px;
-            max-width: 800px;
-            margin: 1rem 0;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            height: 100%;
           }
           .info-container {
             background-color: #f5f7fa;
@@ -50,7 +73,6 @@ export const Layout: FC<LayoutProps> = ({ children, title }) => {
             padding: 1rem;
             margin-bottom: 1rem;
             width: 100%;
-            max-width: 800px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
           }
           footer {
@@ -58,18 +80,21 @@ export const Layout: FC<LayoutProps> = ({ children, title }) => {
             padding: 1rem;
             text-align: center;
             margin-top: auto;
+            position: relative;
+            z-index: 200;
+            width: 100%;
           }
         `}</style>
       </head>
       <body>
         <header>
-          <h1>現在地表示 - IP Geolocation</h1>
+          <h1>{title}</h1>
         </header>
         <main>
           {children}
         </main>
         <footer>
-          <p>Created with Hono and Bun</p>
+          <p>(c) 2025 IP Geolocation</p>
         </footer>
       </body>
     </html>
