@@ -41,17 +41,18 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
         </div>
         
         <div className="form-group">
-          <label htmlFor="message">メッセージ:</label>
-          <textarea 
+          <input 
+            type="text" 
             id="message" 
             name="message" 
-            rows={3} 
             placeholder="この場所の思い出や備考..."
-          ></textarea>
+            maxLength={200}
+            className="message-input"
+          />
         </div>
         
         <button type="submit" className="save-button">
-          <span className="save-icon">📍</span> 気持ちを残す
+          <span className="save-icon">📌</span> 気持ちを残す
         </button>
       </form>
 
@@ -94,7 +95,7 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
         .form-container {
           width: 100%;
           margin-top: 0;
-          padding: 1.5rem 1rem;
+          padding: 1.5rem 0.5rem;
           background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
           border-radius: 12px;
           box-shadow: 0 8px 20px rgba(0,0,0,0.08);
@@ -124,6 +125,7 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
         
         .form-group {
           margin-bottom: 1.5rem;
+          width: 100%;
         }
         
         label {
@@ -131,6 +133,7 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
           margin-bottom: 0.5rem;
           font-weight: 600;
           color: #495057;
+          padding-left: 0.5rem;
         }
         
         .emoji-grid {
@@ -138,6 +141,7 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
           grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
           gap: 10px;
           margin-bottom: 0.5rem;
+          width: 100%;
         }
         
         .emoji-item {
@@ -177,21 +181,29 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
           50% { transform: scale(1.2); }
         }
         
-        textarea {
+        .message-input {
           width: 100%;
-          padding: 0.75rem;
-          border: 1px solid #dee2e6;
-          border-radius: 8px;
+          height: 54px;
+          padding: 0.875rem 1rem;
+          border: 2px solid #e0e5ec;
+          border-radius: 10px;
           font-size: 1rem;
-          box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-          transition: border-color 0.3s, box-shadow 0.3s;
-          resize: vertical;
+          color: #495057;
+          background-color: white;
+          box-shadow: inset 0 1px 4px rgba(0,0,0,0.05);
+          transition: all 0.3s ease;
           font-family: inherit;
+          box-sizing: border-box;
         }
         
-        textarea:focus {
+        .message-input::placeholder {
+          color: #adb5bd;
+          opacity: 0.8;
+        }
+        
+        .message-input:focus {
           border-color: #4a89dc;
-          box-shadow: 0 0 0 3px rgba(74,137,220,0.15);
+          box-shadow: 0 0 0 4px rgba(74,137,220,0.15);
           outline: none;
         }
         
@@ -204,7 +216,7 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
           background: linear-gradient(135deg, #4a89dc 0%, #3a79cc 100%);
           color: white;
           border: none;
-          border-radius: 8px;
+          border-radius: 10px;
           font-size: 1.1rem;
           font-weight: 600;
           cursor: pointer;
@@ -230,7 +242,7 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
         
         @media (max-width: 576px) {
           .form-container {
-            padding: 1rem 0.8rem;
+            padding: 1rem 0.5rem;
           }
           
           .emoji-grid {
@@ -242,6 +254,11 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
             width: 36px;
             height: 36px;
             font-size: 1.3rem;
+          }
+          
+          .message-input {
+            height: 50px;
+            padding: 0.75rem;
           }
         }
       `}</style>
