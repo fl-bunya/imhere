@@ -20,6 +20,9 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
       <form action="/api/locations" method="post">
         <input type="hidden" id="browser_lat" name="browser_lat" value={currentLocation.browser?.lat || 0} />
         <input type="hidden" id="browser_lng" name="browser_lng" value={currentLocation.browser?.lng || 0} />
+        <input type="hidden" name="browser_pref" value={currentLocation.browser?.pref || ''} />
+        <input type="hidden" name="browser_city" value={currentLocation.browser?.city || ''} />
+        <input type="hidden" name="browser_town" value={currentLocation.browser?.town || ''} />
         <input type="hidden" name="ip_lat" value={currentLocation.ip?.lat || 0} />
         <input type="hidden" name="ip_lng" value={currentLocation.ip?.lng || 0} />
         <input type="hidden" name="ip_city" value={currentLocation.ip?.city || ''} />

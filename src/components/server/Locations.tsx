@@ -59,7 +59,7 @@ export const Locations: FC<LocationsProps> = ({ savedLocations }) => {
                   <div className="location-item">
                     <span className="item-label">ブラウザ位置:</span>
                     <span className="item-value">
-                      ({location.browser_lat.toFixed(4)}, {location.browser_lng.toFixed(4)})
+                      {location.browser_pref} {location.browser_city} {location.browser_town} ({location.browser_lat.toFixed(4)}, {location.browser_lng.toFixed(4)})
                     </span>
                   </div>
                 </div>

@@ -54,6 +54,9 @@ app.post('/api/locations', async (c) => {
     const formData = await c.req.formData();
     const browser_lat = Number(formData.get('browser_lat') || 0);
     const browser_lng = Number(formData.get('browser_lng') || 0);
+    const browser_pref = String(formData.get('browser_pref') || '');
+    const browser_city = String(formData.get('browser_city') || '');
+    const browser_town = String(formData.get('browser_town') || '');
     const ip_lat = Number(formData.get('ip_lat') || 0);
     const ip_lng = Number(formData.get('ip_lng') || 0);
     const ip_city = String(formData.get('ip_city') || '');
@@ -68,12 +71,14 @@ app.post('/api/locations', async (c) => {
     const stmt = c.env.DB.prepare(`
       INSERT INTO locations (
         browser_lat, browser_lng, 
+        browser_pref, browser_city, browser_town,
         ip_lat, ip_lng, ip_city, 
         cf_lat, cf_lng, cf_city, cf_colo, 
         client_ip, emoji, message
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       browser_lat, browser_lng,
+      browser_pref, browser_city, browser_town,
       ip_lat, ip_lng, ip_city,
       cf_lat, cf_lng, cf_city, cf_colo,
       client_ip, emoji, message

@@ -273,6 +273,45 @@ async function getCurrentPosition() {
   });
 }
 
+/**
+ * 緯度経度から住所情報を取得する
+ * @param {number} lng - 経度
+ * @param {number} lat - 緯度
+ * @returns {Promise<Object>} 住所情報のオブジェクト
+ */
+async function getAddressFromCoordinates(lng, lat) {
+  try {
+    if (!lng || !lat || isNaN(lng) || isNaN(lat)) {
+      return null;
+    }
+    
+    const response = await fetch(
+      `https://geoapi.heartrails.com/api/json?method=searchByGeoLocation&x=${lng}&y=${lat}`
+    );
+    
+    if (!response.ok) {
+      console.error('住所情報の取得に失敗しました:', response.statusText);
+      return null;
+    }
+    
+    const data = await response.json();
+    if (data?.response?.location && data.response.location.length > 0) {
+      const location = data.response.location[0];
+      return {
+        pref: location.prefecture,
+        city: location.city,
+        town: location.town,
+        postal: location.postal
+      };
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('住所情報の取得中にエラーが発生しました:', error);
+    return null;
+  }
+}
+
 // 位置情報カードのクリックイベントをセットアップする関数
 function setupLocationCardEvents() {
   // すべての位置情報カードを取得
@@ -316,14 +355,42 @@ function resetMapButtonSetup() {
           window.myLocation.browser.lat = position.latitude;
           window.myLocation.browser.lng = position.longitude;
           
-          // フォームのinputフィールドも更新
-          const browserLatInput = document.getElementById('browser_lat');
-          const browserLngInput = document.getElementById('browser_lng');
-          if (browserLatInput) browserLatInput.value = position.latitude;
-          if (browserLngInput) browserLngInput.value = position.longitude;
-          
-          // 現在位置を表示
-          displayCurrentLocation(window.myLocation);
+          // 住所情報を取得して更新
+          getAddressFromCoordinates(position.longitude, position.latitude).then(addressInfo => {
+            if (addressInfo) {
+              window.myLocation.browser.pref = addressInfo.pref;
+              window.myLocation.browser.city = addressInfo.city;
+              window.myLocation.browser.town = addressInfo.town;
+              
+              // フォームの住所情報も更新
+              const browserPrefInput = document.querySelector('input[name="browser_pref"]');
+              const browserCityInput = document.querySelector('input[name="browser_city"]');
+              const browserTownInput = document.querySelector('input[name="browser_town"]');
+              
+              if (browserPrefInput) browserPrefInput.value = addressInfo.pref || '';
+              if (browserCityInput) browserCityInput.value = addressInfo.city || '';
+              if (browserTownInput) browserTownInput.value = addressInfo.town || '';
+            }
+            
+            // フォームの位置情報も更新
+            const browserLatInput = document.getElementById('browser_lat');
+            const browserLngInput = document.getElementById('browser_lng');
+            if (browserLatInput) browserLatInput.value = position.latitude;
+            if (browserLngInput) browserLngInput.value = position.longitude;
+            
+            // 現在位置を表示
+            displayCurrentLocation(window.myLocation);
+          }).catch(error => {
+            console.error('住所情報の取得に失敗しました:', error);
+            
+            // 住所情報が取得できなくても位置情報だけで地図を表示
+            const browserLatInput = document.getElementById('browser_lat');
+            const browserLngInput = document.getElementById('browser_lng');
+            if (browserLatInput) browserLatInput.value = position.latitude;
+            if (browserLngInput) browserLngInput.value = position.longitude;
+            
+            displayCurrentLocation(window.myLocation);
+          });
         }).catch(error => {
           console.error('位置情報の取得に失敗しました:', error);
           // エラーが発生しても既存の位置情報で地図を表示
@@ -349,9 +416,34 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     // ユーザーの現在位置を取得
     const position = await getCurrentPosition();
-    location.browser = {
-      lat: position.latitude,
-      lng: position.longitude,
+    
+    // 初期化または空のオブジェクトを作成
+    if (!location.browser) {
+      location.browser = {};
+    }
+    
+    location.browser.lat = position.latitude;
+    location.browser.lng = position.longitude;
+    
+    // 住所情報を取得
+    try {
+      const addressInfo = await getAddressFromCoordinates(position.longitude, position.latitude);
+      if (addressInfo) {
+        location.browser.pref = addressInfo.pref;
+        location.browser.city = addressInfo.city;
+        location.browser.town = addressInfo.town;
+        
+        // フォームの住所情報も更新
+        const browserPrefInput = document.querySelector('input[name="browser_pref"]');
+        const browserCityInput = document.querySelector('input[name="browser_city"]');
+        const browserTownInput = document.querySelector('input[name="browser_town"]');
+        
+        if (browserPrefInput) browserPrefInput.value = addressInfo.pref || '';
+        if (browserCityInput) browserCityInput.value = addressInfo.city || '';
+        if (browserTownInput) browserTownInput.value = addressInfo.town || '';
+      }
+    } catch (addressError) {
+      console.error('住所情報の取得に失敗しました:', addressError);
     }
     
     // フォームのinputフィールドに位置情報を設定

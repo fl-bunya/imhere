@@ -15,7 +15,11 @@ type Marker = {
 }
 
 export type Location = {
-  browser?: Marker,
+  browser?: Marker & {
+    pref?: string;
+    city?: string;
+    town?: string;
+  },
   ip?: Marker & {
     city?: string;
   },
@@ -32,6 +36,9 @@ export type LocationRecord = {
   id: number;
   browser_lat: number;
   browser_lng: number;
+  browser_pref?: string;
+  browser_city?: string;
+  browser_town?: string;
   ip_lat: number;
   ip_lng: number;
   ip_city: string;
