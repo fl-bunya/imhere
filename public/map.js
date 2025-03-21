@@ -54,9 +54,18 @@ function initializeMap(location) {
         .openPopup();
     }
 
-    createMarker(location.browser.lat, location.browser.lng, 'You', 'blue');
-    createMarker(location.ip.lat, location.ip.lng, 'IP', 'gold');
-    createMarker(location.cf.lat, location.cf.lng, `Cloudflare: ${location.cf.colo}`, 'orange');
+    // 各種位置情報のマーカーを追加
+    if (location.browser && location.browser.lat && location.browser.lng) {
+      createMarker(location.browser.lat, location.browser.lng, 'ブラウザ位置', 'blue');
+    }
+    
+    if (location.ip && location.ip.lat && location.ip.lng) {
+      createMarker(location.ip.lat, location.ip.lng, `IP位置: ${location.ip.city || ''}`, 'gold');
+    }
+    
+    if (location.cf && location.cf.lat && location.cf.lng) {
+      createMarker(location.cf.lat, location.cf.lng, `Cloudflare: ${location.cf.city || ''} - ${location.cf.colo || ''}`, 'orange');
+    }
     
     // 地図の表示範囲を調整して全てのマーカーを表示
     if (bounds.isValid()) {
@@ -156,11 +165,22 @@ document.addEventListener('DOMContentLoaded', async () => {
       lng: position.longitude,
     }
     
+    // フォームのinputフィールドに位置情報を設定
+    const browserLatInput = document.getElementById('browser_lat');
+    const browserLngInput = document.getElementById('browser_lng');
+    
+    if (browserLatInput) browserLatInput.value = position.latitude;
+    if (browserLngInput) browserLngInput.value = position.longitude;
+    
+    console.log('ブラウザの位置情報をフォームに設定しました:', position.latitude, position.longitude);
+    
+    // 地図を初期化
     initializeMap(location);
     
   } catch (error) {
     console.error('位置情報の取得に失敗しました:', error);
     
+    // 位置情報が取得できなくても地図は表示
     initializeMap(location);
   }
 }); 
