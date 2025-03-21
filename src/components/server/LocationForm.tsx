@@ -16,7 +16,7 @@ const popularEmojis = [
 export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
   return (
     <div className="form-container">
-      <h2>この位置情報を保存</h2>
+      <h2>今の気持ちは？</h2>
       <form action="/api/locations" method="post">
         <input type="hidden" id="browser_lat" name="browser_lat" value={currentLocation.browser?.lat || 0} />
         <input type="hidden" id="browser_lng" name="browser_lng" value={currentLocation.browser?.lng || 0} />
@@ -30,7 +30,6 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
         <input type="hidden" name="client_ip" value={currentLocation.clientIP || ''} />
         
         <div className="form-group emoji-section">
-          <label htmlFor="emoji">場所の絵文字を選択:</label>
           <input type="hidden" id="emoji" name="emoji" value="📍" />
           <div className="emoji-grid">
             {popularEmojis.map((emoji) => (
@@ -38,10 +37,6 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
                 {emoji}
               </div>
             ))}
-          </div>
-          <div className="selected-emoji-display">
-            <span>選択中: </span>
-            <span id="selected-emoji">📍</span>
           </div>
         </div>
         
@@ -56,7 +51,7 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
         </div>
         
         <button type="submit" className="save-button">
-          <span className="save-icon">💾</span> 位置情報を保存する
+          <span className="save-icon">📍</span> 気持ちを残す
         </button>
       </form>
 
@@ -66,7 +61,6 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
         document.addEventListener('DOMContentLoaded', function() {
           const emojiItems = document.querySelectorAll('.emoji-item');
           const emojiInput = document.getElementById('emoji');
-          const selectedEmojiDisplay = document.getElementById('selected-emoji');
           
           // 初期状態で📍を選択状態にする
           document.querySelector('.emoji-item[data-emoji="📍"]').classList.add('selected');
@@ -82,9 +76,8 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
               this.classList.add('selected');
               const selectedEmoji = this.getAttribute('data-emoji');
               
-              // 隠し入力フィールドと表示を更新
+              // 隠し入力フィールドを更新
               emojiInput.value = selectedEmoji;
-              selectedEmojiDisplay.textContent = selectedEmoji;
               
               // アニメーション効果
               this.classList.add('bounce');
@@ -182,18 +175,6 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
         @keyframes bounce {
           0%, 100% { transform: scale(1.1); }
           50% { transform: scale(1.2); }
-        }
-        
-        .selected-emoji-display {
-          margin-top: 0.5rem;
-          text-align: center;
-          font-weight: 500;
-          color: #495057;
-        }
-        
-        #selected-emoji {
-          font-size: 1.5rem;
-          vertical-align: middle;
         }
         
         textarea {

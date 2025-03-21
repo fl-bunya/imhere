@@ -13,7 +13,7 @@ type HomePageProps = {
 
 export const HomePage: FC<HomePageProps> = ({ currentLocation, savedLocations }) => {
   return (
-    <Layout title="現在地表示 - IP Geolocation">
+    <Layout title="今ここにいます">
       <Map location={currentLocation} />
       
       <div className="padded-content" style={{ marginTop: '300px' }}>

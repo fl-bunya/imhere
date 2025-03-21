@@ -24,7 +24,11 @@ export const Locations: FC<LocationsProps> = ({ savedLocations }) => {
             const formattedDate = `${dateObj.getFullYear()}/${(dateObj.getMonth() + 1).toString().padStart(2, '0')}/${dateObj.getDate().toString().padStart(2, '0')} ${dateObj.getHours().toString().padStart(2, '0')}:${dateObj.getMinutes().toString().padStart(2, '0')}`;
             
             return (
-              <div className="location-card" key={location.id}>
+              <div 
+                className="location-card" 
+                key={location.id} 
+                data-location={JSON.stringify(location)}
+              >
                 <div className="location-emoji">{location.emoji || '📍'}</div>
                 <div className="location-date">{formattedDate}</div>
                 
@@ -59,6 +63,7 @@ export const Locations: FC<LocationsProps> = ({ savedLocations }) => {
                     </span>
                   </div>
                 </div>
+                <div className="click-hint">クリックでマップ表示</div>
               </div>
             );
           })}
@@ -120,11 +125,19 @@ export const Locations: FC<LocationsProps> = ({ savedLocations }) => {
           transition: transform 0.3s, box-shadow 0.3s;
           position: relative;
           border: 1px solid #e9ecef;
+          cursor: pointer;
         }
         
         .location-card:hover {
           transform: translateY(-5px);
           box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .location-card.active {
+          border: 2px solid #4a89dc;
+          background-color: #f0f5ff;
+          transform: translateY(-5px);
+          box-shadow: 0 8px 15px rgba(74, 137, 220, 0.2);
         }
         
         .location-emoji {
@@ -184,6 +197,21 @@ export const Locations: FC<LocationsProps> = ({ savedLocations }) => {
         
         .item-value {
           color: #6c757d;
+        }
+        
+        .click-hint {
+          position: absolute;
+          bottom: 8px;
+          right: 12px;
+          font-size: 0.7rem;
+          color: #adb5bd;
+          font-style: italic;
+          opacity: 0;
+          transition: opacity 0.2s;
+        }
+        
+        .location-card:hover .click-hint {
+          opacity: 1;
         }
         
         @media (max-width: 576px) {
