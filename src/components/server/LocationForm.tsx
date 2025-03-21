@@ -101,7 +101,7 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
         .form-container {
           width: 100%;
           margin-top: 0;
-          padding: 2rem;
+          padding: 1.5rem 1rem;
           background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
           border-radius: 12px;
           box-shadow: 0 8px 20px rgba(0,0,0,0.08);
@@ -249,7 +249,7 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
         
         @media (max-width: 576px) {
           .form-container {
-            padding: 1.5rem;
+            padding: 1rem 0.8rem;
           }
           
           .emoji-grid {

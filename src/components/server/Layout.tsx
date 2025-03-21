@@ -59,7 +59,7 @@ export const Layout: FC<LayoutProps> = ({ children, title }) => {
             width: 100%;
           }
           .padded-content {
-            padding: 1rem 2rem;
+            padding: 1rem 0.5rem;
             width: 100%;
             box-sizing: border-box;
           }
@@ -83,6 +83,21 @@ export const Layout: FC<LayoutProps> = ({ children, title }) => {
             position: relative;
             z-index: 200;
             width: 100%;
+          }
+          
+          /* モバイル用の調整 */
+          @media (max-width: 480px) {
+            .padded-content {
+              padding: 1rem 0.3rem;
+            }
+          }
+          
+          /* タブレット・PCの場合は少し余白を持たせる */
+          @media (min-width: 1200px) {
+            .padded-content {
+              padding: 1rem calc((100% - 1100px) / 2);
+              max-width: 100%;
+            }
           }
         `}</style>
       </head>
