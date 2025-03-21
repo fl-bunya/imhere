@@ -8,9 +8,36 @@ type LocationFormProps = {
 
 // 位置情報関連の人気絵文字
 const popularEmojis = [
-  '📍', '📌', '🏠', '🏡', '🏢', '🏫', '🏙️', '🏝️',
-  '🏕️', '⛰️', '🌋', '🗻', '🏔️', '🌉', '🌁', '🌃',
-  '🚗', '✈️', '🚅', '🚢', '🚲', '🏖️', '🏞️', '🗿'
+  "👍️",
+  "🙌",
+  "🙏",
+  "🤝",
+  "🫵",
+  "😆",
+  "🥰",
+  "😢",
+  "😎",
+  "😱",
+  "🤩",
+  "😭",
+  "🤮",
+  "💀",
+  "🎉",
+  "💯",
+  "❤️",
+  "🔥",
+  "✨️",
+  "🌸",
+  "🐈️",
+  "🚲",
+  "🀄️",
+  "🏔",
+  "🏠",
+  "🏢",
+  "🍣",
+  "🍜",
+  "❓",
+  "🗿"
 ];
 
 export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
@@ -33,7 +60,7 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
         <input type="hidden" name="client_ip" value={currentLocation.clientIP || ''} />
         
         <div className="form-group emoji-section">
-          <input type="hidden" id="emoji" name="emoji" value="📍" />
+          <input type="hidden" id="emoji" name="emoji" value="👍️" />
           <div className="emoji-grid">
             {popularEmojis.map((emoji) => (
               <div className="emoji-item" data-emoji={emoji} key={emoji}>
@@ -66,8 +93,8 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
           const emojiItems = document.querySelectorAll('.emoji-item');
           const emojiInput = document.getElementById('emoji');
           
-          // 初期状態で📍を選択状態にする
-          document.querySelector('.emoji-item[data-emoji="📍"]').classList.add('selected');
+          // 初期状態で👍️を選択状態にする
+          document.querySelector('.emoji-item[data-emoji="👍️"]').classList.add('selected');
           
           emojiItems.forEach(item => {
             item.addEventListener('click', function() {
