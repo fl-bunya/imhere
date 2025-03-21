@@ -209,6 +209,11 @@ function clearMarkers() {
   
   // マーカーの配列をクリア
   currentMarkers = [];
+  
+  // ポップアップをすべて閉じる
+  globalMap.closePopup();
+  
+  console.log('マーカーをクリアしました');
 }
 
 /**
@@ -293,6 +298,49 @@ function setupLocationCardEvents() {
   });
 }
 
+// 現在地に戻るボタンのセットアップ関数
+function resetMapButtonSetup() {
+  const resetBtn = document.getElementById('reset-map-btn');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', function() {
+      if (typeof window.myLocation === 'object') {
+        // マップを完全にリセット
+        clearMarkers();
+        
+        // ブラウザの位置情報を再取得
+        getCurrentPosition().then(position => {
+          // ブラウザの位置情報を更新
+          if (!window.myLocation.browser) {
+            window.myLocation.browser = {};
+          }
+          window.myLocation.browser.lat = position.latitude;
+          window.myLocation.browser.lng = position.longitude;
+          
+          // フォームのinputフィールドも更新
+          const browserLatInput = document.getElementById('browser_lat');
+          const browserLngInput = document.getElementById('browser_lng');
+          if (browserLatInput) browserLatInput.value = position.latitude;
+          if (browserLngInput) browserLngInput.value = position.longitude;
+          
+          // 現在位置を表示
+          displayCurrentLocation(window.myLocation);
+        }).catch(error => {
+          console.error('位置情報の取得に失敗しました:', error);
+          // エラーが発生しても既存の位置情報で地図を表示
+          displayCurrentLocation(window.myLocation);
+        });
+        
+        // 選択中のカードのハイライトを解除
+        document.querySelectorAll('.location-card').forEach(card => {
+          card.classList.remove('active');
+        });
+        
+        console.log('地図を現在地に戻しました');
+      }
+    });
+  }
+}
+
 // ページ読み込み時に実行
 document.addEventListener('DOMContentLoaded', async () => {
   // IP, Cloudflare位置を取得
@@ -327,6 +375,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // 位置情報カードのイベントをセットアップ
   setupLocationCardEvents();
+  
+  // 現在地に戻るボタンのセットアップ
+  resetMapButtonSetup();
   
   // DOMが変更された場合（新しいカードが追加された場合など）の対応
   const observer = new MutationObserver(function(mutations) {
