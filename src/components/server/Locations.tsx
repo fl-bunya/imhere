@@ -15,7 +15,11 @@ export const Locations: FC<LocationsProps> = ({ savedLocations }) => {
       ) : (
         <div className="locations-list">
           {savedLocations.map((loc) => (
-            <div key={loc.id} className="location-card">
+            <div 
+              key={loc.id} 
+              className="location-card" 
+              data-location={JSON.stringify(loc)}
+            >
               <div className="location-header">
                 <span className="location-emoji">{loc.emoji || '📍'}</span>
                 <span className="location-date">{new Date(loc.created_at).toLocaleString('ja-JP')}</span>
@@ -70,11 +74,30 @@ export const Locations: FC<LocationsProps> = ({ savedLocations }) => {
           border-radius: 8px;
           padding: 1rem;
           box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-          transition: transform 0.2s;
+          transition: transform 0.2s, box-shadow 0.2s;
+          cursor: pointer;
+          position: relative;
         }
         .location-card:hover {
           transform: translateY(-3px);
           box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .location-card.active {
+          border: 2px solid #4a89dc;
+          background-color: #f0f5ff;
+        }
+        .location-card::after {
+          content: 'クリックでマップ表示';
+          position: absolute;
+          bottom: 8px;
+          right: 8px;
+          font-size: 0.7rem;
+          color: #999;
+          opacity: 0;
+          transition: opacity 0.2s;
+        }
+        .location-card:hover::after {
+          opacity: 1;
         }
         .location-header {
           display: flex;
