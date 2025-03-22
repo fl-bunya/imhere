@@ -13,7 +13,7 @@ type HomePageProps = {
 
 export const HomePage: FC<HomePageProps> = ({ currentLocation, savedLocations }) => {
   return (
-    <Layout title="ここにいます">
+    <Layout title="I'm here">
       <Map location={currentLocation} />
       
       <div className="padded-content" style={{ marginTop: '300px', paddingTop: 0 }}>

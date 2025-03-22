@@ -253,7 +253,7 @@ export const Locations: FC<LocationsProps> = ({ savedLocations }) => {
               if (latestCard) {
                 // スムーズにスクロール
                 setTimeout(() => {
-                  latestCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  latestCard.scrollIntoView({ behavior: 'smooth', block: 'end' });
                   
                   // カードをハイライト表示
                   latestCard.classList.add('active');
