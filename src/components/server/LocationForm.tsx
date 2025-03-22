@@ -116,6 +116,67 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
               }, 300);
             });
           });
+
+          // モバイルデバイスかどうかをチェック
+          function isMobileDevice() {
+            const ua = navigator.userAgent.toLowerCase();
+            const isIOS = /iphone|ipad|ipod/.test(ua);
+            const isAndroid = /android/.test(ua);
+            const isMobile = /mobile|phone|tablet|ip(ad|od|hone)|android|blackberry|iemobile|opera mini/.test(ua);
+            
+            // モバイルデバイスの特徴や画面サイズもチェック
+            const hasTouchScreen = ('ontouchstart' in window) || 
+                                  (navigator.maxTouchPoints > 0) || 
+                                  (navigator.msMaxTouchPoints > 0);
+            const isSmallScreen = window.innerWidth <= 768;
+            
+            return (isIOS || isAndroid || isMobile || (hasTouchScreen && isSmallScreen));
+          }
+
+          // フォーカス問題対策: スクロール位置を維持する
+          const messageInput = document.getElementById('message');
+          
+          // モバイルデバイスでのみ実行
+          if (messageInput && isMobileDevice()) {
+            let scrollPosition = 0;
+            let isFocused = false;
+            const body = document.body;
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            
+            // スクロール位置を記録する関数
+            function saveScrollPosition() {
+              scrollPosition = window.scrollY || window.pageYOffset;
+            }
+            
+            // スクロール位置を復元する関数
+            function restoreScrollPosition() {
+              // iOSでは少し遅延させる
+              const delay = isIOS ? 300 : 10;
+              
+              setTimeout(() => {
+                // ウィンドウのスクロールを強制的に元の位置に戻す
+                window.scrollTo({
+                  top: scrollPosition,
+                  behavior: 'smooth'
+                });
+              }, delay);
+            }
+            
+            // フォーカス時の処理
+            messageInput.addEventListener('focus', function() {
+              // スクロール位置を保存
+              saveScrollPosition();
+              isFocused = true;
+            });
+            
+            // フォーカス解除時の処理
+            messageInput.addEventListener('blur', function() {
+              if (isFocused) {
+                isFocused = false;
+                restoreScrollPosition();
+              }
+            });
+          }
         });
         `
       }}></script>
@@ -129,6 +190,7 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
           border-radius: 12px;
           box-shadow: 0 8px 20px rgba(0,0,0,0.08);
           border: 1px solid rgba(255,255,255,0.8);
+          -webkit-tap-highlight-color: transparent; /* タップ時のハイライトを削除 */
         }
         
         h2 {
@@ -230,6 +292,8 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
           transition: all 0.3s ease;
           font-family: inherit;
           box-sizing: border-box;
+          -webkit-appearance: none; /* iOSのデフォルトスタイルを削除 */
+          appearance: none;
         }
         
         .message-input::placeholder {
@@ -271,6 +335,11 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
         .send-button:active {
           transform: translateY(0);
           box-shadow: 0 2px 5px rgba(74,137,220,0.2);
+        }
+        
+        .send-button.submitting {
+          opacity: 0.7;
+          transform: scale(0.95);
         }
         
         @media (max-width: 576px) {
