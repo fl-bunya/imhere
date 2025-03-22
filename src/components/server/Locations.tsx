@@ -42,8 +42,16 @@ export const Locations: FC<LocationsProps> = ({ savedLocations }) => {
                   <div className="location-message">{location.message}</div>
                 )}
                 
-                <div className="location-address">
+                <div className="location-meta">
                   {address}
+                  {location.browser_lat && location.browser_lng && (
+                    <span className="location-coords">
+                      {' '}({location.browser_lat.toFixed(5)},{location.browser_lng.toFixed(5)})
+                    </span>
+                  )}
+                  {location.cf_colo && (
+                    <span className="location-colo">{' '}CF:{location.cf_colo}</span>
+                  )}
                 </div>
               </div>
             );
@@ -161,12 +169,24 @@ export const Locations: FC<LocationsProps> = ({ savedLocations }) => {
           word-break: break-word;
         }
         
-        .location-address {
-          font-size: 1rem;
+        .location-meta {
+          font-size: 0.85rem;
           color: #495057;
-          font-weight: 500;
           margin-top: auto;
-          padding-bottom: 0.5rem;
+          word-break: break-word;
+          line-height: 1.4;
+        }
+        
+        .location-coords, .location-colo {
+          font-size: 0.75rem;
+          color: #adb5bd;
+          font-family: monospace;
+          white-space: nowrap;
+        }
+        
+        .location-colo {
+          float: right;
+          margin-left: auto;
         }
         
         /* ハイライトパルスアニメーション */
@@ -193,6 +213,14 @@ export const Locations: FC<LocationsProps> = ({ savedLocations }) => {
           .location-card {
             padding: 1rem;
             min-height: 100px;
+          }
+          
+          .location-meta {
+            font-size: 0.8rem;
+          }
+          
+          .location-coords, .location-colo {
+            font-size: 0.7rem;
           }
         }
         
