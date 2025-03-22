@@ -71,14 +71,16 @@ function displayCurrentLocation(location) {
   // 既存のマーカーをクリア
   clearMarkers();
   
-  // マーカーを配置するための境界ボックスを作成
-  const bounds = L.latLngBounds();
+  // 有効なマーカー位置を格納する配列
+  const markerPositions = [];
+  let browserPosition = null;
   
   // 各種位置情報のマーカーを追加
   if (location.browser && location.browser.lat && location.browser.lng) {
     const marker = createMarker(location.browser.lat, location.browser.lng, 'ブラウザ位置', 'blue');
     if (marker) {
-      bounds.extend([location.browser.lat, location.browser.lng]);
+      browserPosition = [location.browser.lat, location.browser.lng];
+      markerPositions.push(browserPosition);
       currentMarkers.push(marker);
     }
   }
@@ -86,7 +88,7 @@ function displayCurrentLocation(location) {
   if (location.ip && location.ip.lat && location.ip.lng) {
     const marker = createMarker(location.ip.lat, location.ip.lng, `IP位置: ${location.ip.city || ''}`, 'gold');
     if (marker) {
-      bounds.extend([location.ip.lat, location.ip.lng]);
+      markerPositions.push([location.ip.lat, location.ip.lng]);
       currentMarkers.push(marker);
     }
   }
@@ -94,20 +96,69 @@ function displayCurrentLocation(location) {
   if (location.cf && location.cf.lat && location.cf.lng) {
     const marker = createMarker(location.cf.lat, location.cf.lng, `Cloudflare: ${location.cf.city || ''} - ${location.cf.colo || ''}`, 'orange');
     if (marker) {
-      bounds.extend([location.cf.lat, location.cf.lng]);
+      markerPositions.push([location.cf.lat, location.cf.lng]);
       currentMarkers.push(marker);
     }
   }
   
-  // 地図の表示範囲を調整して全てのマーカーを表示
-  if (bounds.isValid()) {
-    globalMap.fitBounds(bounds, {
-      padding: [60, 60], // 境界から余白を持たせる（上下左右に60px）
-      maxZoom: 13,       // ズームしすぎないように制限（近づきすぎないように13に制限）
-      animate: true      // アニメーションを有効
-    });
+  // 表示範囲を調整
+  if (markerPositions.length > 0) {
+    // ブラウザ位置がある場合は、それを中心に表示
+    if (browserPosition) {
+      // まずブラウザ位置を中心に設定
+      globalMap.setView(browserPosition, 12);
+      
+      if (markerPositions.length > 1) {
+        // ブラウザ位置以外のマーカーがある場合
+        
+        // 最大距離を計算（ブラウザ位置からの最大距離）
+        let maxDistance = 0;
+        let farthestPosition = null;
+        
+        for (const position of markerPositions) {
+          // ブラウザ位置自体はスキップ
+          if (position[0] === browserPosition[0] && position[1] === browserPosition[1]) {
+            continue;
+          }
+          
+          // ブラウザ位置からの距離を計算
+          const distance = calculateDistance(
+            browserPosition[0], browserPosition[1],
+            position[0], position[1]
+          );
+          
+          if (distance > maxDistance) {
+            maxDistance = distance;
+            farthestPosition = position;
+          }
+        }
+        
+        if (farthestPosition) {
+          // 最も遠いマーカーと中心（ブラウザ位置）から適切な境界を作成
+          const bounds = createBoundsFromCenterAndPoint(
+            browserPosition[0], browserPosition[1],
+            farthestPosition[0], farthestPosition[1]
+          );
+          
+          // 境界に合わせて地図を調整
+          globalMap.fitBounds(bounds, {
+            padding: [60, 60], // 境界から余白を持たせる
+            maxZoom: 13,       // ズームレベルを制限
+            animate: true      // アニメーションを有効
+          });
+        }
+      }
+    } else {
+      // ブラウザ位置がない場合は通常の方法で境界を計算
+      const bounds = L.latLngBounds(markerPositions);
+      globalMap.fitBounds(bounds, {
+        padding: [60, 60],
+        maxZoom: 13,
+        animate: true
+      });
+    }
   } else {
-    // 境界が無効な場合は東京をデフォルト表示
+    // マーカーがない場合は東京をデフォルト表示
     globalMap.setView([35.6895, 139.6917], 13);
   }
 }
@@ -119,8 +170,10 @@ function displaySavedLocation(locationData) {
   // 既存のマーカーをクリア
   clearMarkers();
   
-  // マーカーを配置するための境界ボックスを作成
-  const bounds = L.latLngBounds();
+  // 有効なマーカー位置を格納する配列
+  const markerPositions = [];
+  let browserPosition = null;
+  let messagePopup = null;
   
   // 保存された位置情報のマーカーを追加
   if (locationData.browser_lat && locationData.browser_lng) {
@@ -131,7 +184,8 @@ function displaySavedLocation(locationData) {
       'blue'
     );
     if (marker) {
-      bounds.extend([locationData.browser_lat, locationData.browser_lng]);
+      browserPosition = [locationData.browser_lat, locationData.browser_lng];
+      markerPositions.push(browserPosition);
       currentMarkers.push(marker);
     }
   }
@@ -144,7 +198,7 @@ function displaySavedLocation(locationData) {
       'gold'
     );
     if (marker) {
-      bounds.extend([locationData.ip_lat, locationData.ip_lng]);
+      markerPositions.push([locationData.ip_lat, locationData.ip_lng]);
       currentMarkers.push(marker);
     }
   }
@@ -157,48 +211,103 @@ function displaySavedLocation(locationData) {
       'orange'
     );
     if (marker) {
-      bounds.extend([locationData.cf_lat, locationData.cf_lng]);
+      markerPositions.push([locationData.cf_lat, locationData.cf_lng]);
       currentMarkers.push(marker);
     }
   }
   
-  // メッセージがあれば表示
-  if (locationData.message) {
-    const messageLatLng = locationData.browser_lat && locationData.browser_lng
-      ? [locationData.browser_lat, locationData.browser_lng]
-      : bounds.getCenter();
-    const messagePopup = L.popup({
-      autoPan: true,               // 自動的にポップアップが見えるようにパンする
-      autoPanPadding: [50, 50],    // パン時の余白
-      minWidth: 200,               // 最小幅を設定
-      keepInView: true,            // 地図の範囲内に保持
-      closeButton: true            // 閉じるボタンを表示
-    })
-      .setLatLng(messageLatLng)
-      .setContent(`<div class="saved-popup"><strong>${locationData.emoji || '📍'}</strong><p>${locationData.message}</p><small>${new Date(locationData.created_at).toLocaleString('ja-JP')}</small></div>`)
-      .openOn(globalMap);
-    
-    // スタイルを追加
-    const style = document.createElement('style');
-    style.textContent = `
-      .saved-popup { text-align: center; }
-      .saved-popup strong { font-size: 1.5rem; display: block; margin-bottom: 0.5rem; }
-      .saved-popup p { margin: 0.5rem 0; }
-      .saved-popup small { color: #666; display: block; margin-top: 0.5rem; }
-    `;
-    document.head.appendChild(style);
+  // まず地図の表示範囲を調整する（この時点ではメッセージポップアップはまだ表示しない）
+  if (markerPositions.length > 0) {
+    // ブラウザ位置がある場合は、それを中心に表示
+    if (browserPosition) {
+      // パンとズームの調整を1回の操作で行うようにする
+      if (markerPositions.length > 1) {
+        // ブラウザ位置以外のマーカーがある場合
+        
+        // 最大距離を計算（ブラウザ位置からの最大距離）
+        let maxDistance = 0;
+        let farthestPosition = null;
+        
+        for (const position of markerPositions) {
+          // ブラウザ位置自体はスキップ
+          if (position[0] === browserPosition[0] && position[1] === browserPosition[1]) {
+            continue;
+          }
+          
+          // ブラウザ位置からの距離を計算
+          const distance = calculateDistance(
+            browserPosition[0], browserPosition[1],
+            position[0], position[1]
+          );
+          
+          if (distance > maxDistance) {
+            maxDistance = distance;
+            farthestPosition = position;
+          }
+        }
+        
+        if (farthestPosition) {
+          // 最も遠いマーカーと中心（ブラウザ位置）から適切な境界を作成
+          const bounds = createBoundsFromCenterAndPoint(
+            browserPosition[0], browserPosition[1],
+            farthestPosition[0], farthestPosition[1]
+          );
+          
+          // 境界に合わせて地図を調整（一度の操作で行う）
+          globalMap.fitBounds(bounds, {
+            padding: [60, 60], // 境界から余白を持たせる
+            maxZoom: 13,       // ズームレベルを制限
+            animate: true      // アニメーションを有効
+          });
+        } else {
+          // 最遠点が見つからない場合（マーカーが1つだけの場合など）
+          globalMap.setView(browserPosition, 13);
+        }
+      } else {
+        // マーカーが1つだけの場合（ブラウザ位置のみ）
+        globalMap.setView(browserPosition, 13);
+      }
+    } else {
+      // ブラウザ位置がない場合は通常の方法で境界を計算
+      const bounds = L.latLngBounds(markerPositions);
+      globalMap.fitBounds(bounds, {
+        padding: [60, 60],
+        maxZoom: 13,
+        animate: true
+      });
+    }
+  } else {
+    // マーカーがない場合は東京をデフォルト表示
+    globalMap.setView([35.6895, 139.6917], 13);
   }
   
-  // 地図の表示範囲を調整して全てのマーカーを表示
-  if (bounds.isValid()) {
-    globalMap.fitBounds(bounds, {
-      padding: [60, 60], // 境界から余白を持たせる（上下左右に60px）
-      maxZoom: 13,       // ズームしすぎないように制限（近づきすぎないように13に制限）
-      animate: true      // アニメーションを有効
-    });
-  } else {
-    // 境界が無効な場合は東京をデフォルト表示
-    globalMap.setView([35.6895, 139.6917], 13);
+  // 地図の表示範囲が設定された後にメッセージポップアップを表示
+  if (locationData.message) {
+    // fitBoundsやsetViewの操作が完了した後にポップアップを表示するため、
+    // わずかな遅延を持たせる（アニメーションの完了を待つ）
+    setTimeout(() => {
+      const messageLatLng = browserPosition || (markerPositions.length > 0 ? markerPositions[0] : null);
+      if (messageLatLng) {
+        messagePopup = L.popup({
+          autoPan: true,               // 自動的にポップアップが見えるようにパンする
+          minWidth: 200,               // 最小幅を設定
+          closeButton: true            // 閉じるボタンを表示
+        })
+          .setLatLng(messageLatLng)
+          .setContent(`<div class="saved-popup"><strong>${locationData.emoji || '📍'}</strong><p>${locationData.message}</p><small>${new Date(locationData.created_at).toLocaleString('ja-JP')}</small></div>`)
+          .openOn(globalMap);
+        
+        // スタイルを追加
+        const style = document.createElement('style');
+        style.textContent = `
+          .saved-popup { text-align: center; }
+          .saved-popup strong { font-size: 1.5rem; display: block; margin-bottom: 0.5rem; }
+          .saved-popup p { margin: 0.5rem 0; }
+          .saved-popup small { color: #666; display: block; margin-top: 0.5rem; }
+        `;
+        document.head.appendChild(style);
+      }
+    }, 100); // わずかな遅延を設定
   }
 }
 
@@ -221,7 +330,6 @@ function createMarker(lat, lng, info, color) {
     .bindPopup(info, {
       autoPan: true,               // 自動的にポップアップが見えるようにパンする
       autoPanPadding: [50, 50],    // パン時の余白
-      keepInView: true,            // 地図の範囲内に保持
       offset: [0, -5]              // 少し上にオフセット
     });
   
@@ -522,4 +630,48 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (locationsContainer) {
     observer.observe(locationsContainer, { childList: true, subtree: true });
   }
-}); 
+});
+
+// 2点間の距離を計算する関数（ハバーサイン公式）
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; // 地球の半径 (km)
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // 距離（km）
+}
+
+// 中心点と別の点から対角線上の点を含む境界を作成する関数
+function createBoundsFromCenterAndPoint(centerLat, centerLng, pointLat, pointLng) {
+  // 中心点と指定した点の差分を計算
+  const latDiff = pointLat - centerLat;
+  const lngDiff = pointLng - centerLng;
+  
+  // 対角線上の点を計算（中心から見て反対側）
+  const oppositePointLat = centerLat - latDiff;
+  const oppositePointLng = centerLng - lngDiff;
+  
+  // 境界を作成（最も遠い点と対角線上の点を使用）
+  const bounds = L.latLngBounds(
+    [Math.min(pointLat, oppositePointLat), Math.min(pointLng, oppositePointLng)],
+    [Math.max(pointLat, oppositePointLat), Math.max(pointLng, oppositePointLng)]
+  );
+  
+  // バウンドが小さすぎないかチェック
+  const minBoundSize = 0.01; // 最小境界サイズ（約1.1km相当）
+  
+  if (Math.abs(bounds.getNorth() - bounds.getSouth()) < minBoundSize || 
+      Math.abs(bounds.getEast() - bounds.getWest()) < minBoundSize) {
+    // 境界が小さすぎる場合、中心点から一定範囲に拡大
+    return L.latLngBounds(
+      [centerLat - minBoundSize/2, centerLng - minBoundSize/2],
+      [centerLat + minBoundSize/2, centerLng + minBoundSize/2]
+    );
+  }
+  
+  return bounds;
+} 
