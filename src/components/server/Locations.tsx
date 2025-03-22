@@ -43,15 +43,17 @@ export const Locations: FC<LocationsProps> = ({ savedLocations }) => {
                 )}
                 
                 <div className="location-meta">
-                  {address}
-                  {location.browser_lat && location.browser_lng && (
-                    <span className="location-coords">
-                      {' '}({location.browser_lat.toFixed(5)},{location.browser_lng.toFixed(5)})
-                    </span>
-                  )}
-                  {location.cf_colo && (
-                    <span className="location-colo">{' '}CF:{location.cf_colo}</span>
-                  )}
+                  <div className="location-address">{address}</div>
+                  <div className="location-details">
+                    {location.browser_lat && location.browser_lng && (
+                      <span className="location-coords">
+                        ({location.browser_lat.toFixed(5)},{location.browser_lng.toFixed(5)})
+                      </span>
+                    )}
+                    {location.cf_colo && (
+                      <span className="location-colo">CF:{location.cf_colo}</span>
+                    )}
+                  </div>
                 </div>
               </div>
             );
@@ -177,15 +179,23 @@ export const Locations: FC<LocationsProps> = ({ savedLocations }) => {
           line-height: 1.4;
         }
         
+        .location-address {
+          margin-bottom: 0.2rem;
+        }
+        
+        .location-details {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        
         .location-coords, .location-colo {
           font-size: 0.75rem;
           color: #adb5bd;
           font-family: monospace;
-          white-space: nowrap;
         }
         
         .location-colo {
-          float: right;
           margin-left: auto;
         }
         
