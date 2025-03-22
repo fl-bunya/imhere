@@ -85,7 +85,7 @@ app.post('/api/locations', async (c) => {
     );
 
     await stmt.run();
-    return c.redirect('/');
+    return c.redirect('/#latest-location');
   } catch (error) {
     console.error('Error saving location:', error);
     return c.text('保存中にエラーが発生しました', 500);

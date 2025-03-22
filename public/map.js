@@ -202,6 +202,9 @@ function displaySavedLocation(locationData) {
   }
 }
 
+// displaySavedLocation関数をグローバルスコープに公開
+window.displaySavedLocation = displaySavedLocation;
+
 // マーカーを作成する関数
 function createMarker(lat, lng, info, color) {
   if (!lat || !lng || !globalMap) {

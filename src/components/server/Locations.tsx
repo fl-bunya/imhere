@@ -18,7 +18,7 @@ export const Locations: FC<LocationsProps> = ({ savedLocations }) => {
         </div>
       ) : (
         <div className="location-grid">
-          {savedLocations.map((location) => {
+          {savedLocations.map((location, index) => {
             // 日付フォーマットの処理
             const dateObj = new Date(location.created_at);
             const formattedDate = `${dateObj.getFullYear()}/${(dateObj.getMonth() + 1).toString().padStart(2, '0')}/${dateObj.getDate().toString().padStart(2, '0')} ${dateObj.getHours().toString().padStart(2, '0')}:${dateObj.getMinutes().toString().padStart(2, '0')}`;
@@ -28,6 +28,7 @@ export const Locations: FC<LocationsProps> = ({ savedLocations }) => {
                 className="location-card" 
                 key={location.id} 
                 data-location={JSON.stringify(location)}
+                id={index === 0 ? 'latest-location' : undefined}
               >
                 <div className="location-emoji">{location.emoji || '📍'}</div>
                 <div className="location-date">{formattedDate}</div>
@@ -214,6 +215,17 @@ export const Locations: FC<LocationsProps> = ({ savedLocations }) => {
           opacity: 1;
         }
         
+        /* ハイライトパルスアニメーション */
+        @keyframes highlightPulse {
+          0% { box-shadow: 0 0 0 0 rgba(74, 137, 220, 0.7); }
+          70% { box-shadow: 0 0 0 15px rgba(74, 137, 220, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(74, 137, 220, 0); }
+        }
+        
+        .highlight-pulse {
+          animation: highlightPulse 1s ease-out infinite;
+        }
+        
         @media (max-width: 576px) {
           .locations-container {
             padding: 1rem 0.8rem;
@@ -236,6 +248,43 @@ export const Locations: FC<LocationsProps> = ({ savedLocations }) => {
           }
         }
       `}</style>
+      
+      <script dangerouslySetInnerHTML={{
+        __html: `
+          document.addEventListener('DOMContentLoaded', function() {
+            // URLのハッシュをチェック
+            if (window.location.hash === '#latest-location') {
+              // 最新の位置情報カードを取得
+              const latestCard = document.getElementById('latest-location');
+              
+              if (latestCard) {
+                // スムーズにスクロール
+                setTimeout(() => {
+                  latestCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  
+                  // カードをハイライト表示
+                  latestCard.classList.add('active');
+                  
+                  // 位置情報を地図に表示
+                  const locationData = JSON.parse(latestCard.getAttribute('data-location') || '{}');
+                  if (locationData.id && window.displaySavedLocation) {
+                    window.displaySavedLocation(locationData);
+                  }
+                  
+                  // アニメーション効果
+                  latestCard.classList.add('highlight-pulse');
+                  setTimeout(() => {
+                    latestCard.classList.remove('highlight-pulse');
+                  }, 2000);
+                }, 300);
+                
+                // ハッシュを削除（ページを再読み込みしても自動スクロールしないように）
+                history.replaceState(null, document.title, window.location.pathname);
+              }
+            }
+          });
+        `
+      }}></script>
     </div>
   );
 };
