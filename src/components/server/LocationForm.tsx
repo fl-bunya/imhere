@@ -61,12 +61,14 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
         
         <div className="form-group emoji-section">
           <input type="hidden" id="emoji" name="emoji" value="👍️" />
-          <div className="emoji-grid">
-            {popularEmojis.map((emoji) => (
-              <div className="emoji-item" data-emoji={emoji} key={emoji}>
-                {emoji}
-              </div>
-            ))}
+          <div className="emoji-carousel-container">
+            <div className="emoji-carousel">
+              {popularEmojis.map((emoji) => (
+                <div className="emoji-item" data-emoji={emoji} key={emoji}>
+                  {emoji}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
         
@@ -91,6 +93,7 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
         document.addEventListener('DOMContentLoaded', function() {
           const emojiItems = document.querySelectorAll('.emoji-item');
           const emojiInput = document.getElementById('emoji');
+          const emojiCarousel = document.querySelector('.emoji-carousel');
           
           // 初期状態で👍️を選択状態にする
           document.querySelector('.emoji-item[data-emoji="👍️"]').classList.add('selected');
@@ -116,6 +119,53 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
               }, 300);
             });
           });
+
+          // カルーセルのドラッグスクロール機能
+          if (emojiCarousel) {
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+            
+            emojiCarousel.addEventListener('mousedown', (e) => {
+              isDown = true;
+              emojiCarousel.classList.add('grabbing');
+              startX = e.pageX - emojiCarousel.offsetLeft;
+              scrollLeft = emojiCarousel.scrollLeft;
+            });
+            
+            emojiCarousel.addEventListener('mouseleave', () => {
+              isDown = false;
+              emojiCarousel.classList.remove('grabbing');
+            });
+            
+            emojiCarousel.addEventListener('mouseup', () => {
+              isDown = false;
+              emojiCarousel.classList.remove('grabbing');
+            });
+            
+            emojiCarousel.addEventListener('mousemove', (e) => {
+              if (!isDown) return;
+              e.preventDefault();
+              const x = e.pageX - emojiCarousel.offsetLeft;
+              const walk = (x - startX) * 2; // スクロール速度の調整
+              emojiCarousel.scrollLeft = scrollLeft - walk;
+            });
+            
+            // タッチデバイス用のイベント
+            emojiCarousel.addEventListener('touchstart', (e) => {
+              startX = e.touches[0].pageX - emojiCarousel.offsetLeft;
+              scrollLeft = emojiCarousel.scrollLeft;
+            }, { passive: true });
+            
+            emojiCarousel.addEventListener('touchmove', (e) => {
+              if (e.cancelable) {
+                e.preventDefault();
+              }
+              const x = e.touches[0].pageX - emojiCarousel.offsetLeft;
+              const walk = (x - startX) * 2;
+              emojiCarousel.scrollLeft = scrollLeft - walk;
+            }, { passive: false });
+          }
 
           // モバイルデバイスかどうかをチェック
           function isMobileDevice() {
@@ -227,20 +277,60 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
           padding-left: 0.5rem;
         }
         
-        .emoji-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
-          gap: 10px;
-          margin-bottom: 0.5rem;
+        .emoji-carousel-container {
           width: 100%;
+          overflow: hidden;
+          position: relative;
+          padding: 5px 0;
+        }
+        
+        .emoji-carousel-container::before,
+        .emoji-carousel-container::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: 30px;
+          pointer-events: none;
+          z-index: 1;
+        }
+        
+        .emoji-carousel-container::before {
+          left: 0;
+          background: linear-gradient(to right, rgba(248, 249, 250, 0.9), rgba(248, 249, 250, 0));
+        }
+        
+        .emoji-carousel-container::after {
+          right: 0;
+          background: linear-gradient(to left, rgba(248, 249, 250, 0.9), rgba(248, 249, 250, 0));
+        }
+        
+        .emoji-carousel {
+          display: flex;
+          gap: 10px;
+          overflow-x: auto;
+          overflow-y: hidden;
+          scroll-behavior: smooth;
+          -webkit-overflow-scrolling: touch;
+          padding: 5px 10px;
+          scrollbar-width: none; /* Firefox */
+          cursor: grab;
+        }
+        
+        .emoji-carousel::-webkit-scrollbar {
+          display: none; /* Chrome, Safari, Edge */
+        }
+        
+        .emoji-carousel.grabbing {
+          cursor: grabbing;
         }
         
         .emoji-item {
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 40px;
-          height: 40px;
+          min-width: 45px;
+          height: 45px;
           font-size: 1.5rem;
           background-color: white;
           border-radius: 8px;
@@ -248,6 +338,7 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
           transition: all 0.2s ease;
           border: 1px solid #dee2e6;
           user-select: none;
+          flex-shrink: 0;
         }
         
         .emoji-item:hover {
@@ -347,14 +438,9 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
             padding: 1rem 0.5rem;
           }
           
-          .emoji-grid {
-            grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
-            gap: 8px;
-          }
-          
           .emoji-item {
-            width: 36px;
-            height: 36px;
+            min-width: 40px;
+            height: 40px;
             font-size: 1.3rem;
           }
           
