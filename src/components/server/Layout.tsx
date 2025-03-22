@@ -56,10 +56,52 @@ export const Layout: FC<LayoutProps> = ({ children, title }) => {
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
           }
           
+          /* スクロールトップボタン */
+          .scroll-top-button {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #4a89dc;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            border: none;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+          }
+          
+          .scroll-top-button.visible {
+            opacity: 0.9;
+            visibility: visible;
+          }
+          
+          .scroll-top-button:hover {
+            opacity: 1;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+          }
+          
           /* モバイル用の調整 */
           @media (max-width: 480px) {
             .padded-content {
               padding: 1rem 0.3rem;
+            }
+            
+            .scroll-top-button {
+              width: 40px;
+              height: 40px;
+              font-size: 20px;
+              right: 15px;
+              bottom: 15px;
             }
           }
           
@@ -76,6 +118,36 @@ export const Layout: FC<LayoutProps> = ({ children, title }) => {
         <main>
           {children}
         </main>
+        
+        <button id="scrollTopButton" className="scroll-top-button" title="最上部に戻る">
+          ↑
+        </button>
+        
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            document.addEventListener('DOMContentLoaded', function() {
+              const scrollButton = document.getElementById('scrollTopButton');
+              const scrollThreshold = 300; // スクロール量がこの値を超えたらボタンを表示
+              
+              // スクロールイベントでボタンの表示・非表示を切り替え
+              window.addEventListener('scroll', function() {
+                if (window.scrollY > scrollThreshold) {
+                  scrollButton.classList.add('visible');
+                } else {
+                  scrollButton.classList.remove('visible');
+                }
+              });
+              
+              // ボタンクリック時に最上部にスクロール
+              scrollButton.addEventListener('click', function() {
+                window.scrollTo({
+                  top: 0,
+                  behavior: 'smooth'
+                });
+              });
+            });
+          `
+        }}></script>
       </body>
     </html>
   );
