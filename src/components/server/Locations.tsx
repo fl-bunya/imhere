@@ -23,6 +23,11 @@ export const Locations: FC<LocationsProps> = ({ savedLocations }) => {
             const dateObj = new Date(location.created_at);
             const formattedDate = `${dateObj.getFullYear()}/${(dateObj.getMonth() + 1).toString().padStart(2, '0')}/${dateObj.getDate().toString().padStart(2, '0')} ${dateObj.getHours().toString().padStart(2, '0')}:${dateObj.getMinutes().toString().padStart(2, '0')}`;
             
+            // 住所情報を整形
+            const address = [location.browser_pref, location.browser_city, location.browser_town]
+              .filter(part => part && part.trim() !== '')
+              .join(' ');
+            
             return (
               <div 
                 className="location-card" 
@@ -37,34 +42,9 @@ export const Locations: FC<LocationsProps> = ({ savedLocations }) => {
                   <div className="location-message">{location.message}</div>
                 )}
                 
-                <div className="location-details">
-                  {location.ip_city && (
-                    <div className="location-item">
-                      <span className="item-label">IP位置:</span>
-                      <span className="item-value">
-                        {location.ip_city} ({location.ip_lat.toFixed(4)}, {location.ip_lng.toFixed(4)})
-                      </span>
-                    </div>
-                  )}
-                  
-                  {location.cf_city && (
-                    <div className="location-item">
-                      <span className="item-label">Cloudflare位置:</span>
-                      <span className="item-value">
-                        {location.cf_city} ({location.cf_lat.toFixed(4)}, {location.cf_lng.toFixed(4)})
-                        {location.cf_colo && ` - ${location.cf_colo}`}
-                      </span>
-                    </div>
-                  )}
-                  
-                  <div className="location-item">
-                    <span className="item-label">ブラウザ位置:</span>
-                    <span className="item-value">
-                      {location.browser_pref} {location.browser_city} {location.browser_town} ({location.browser_lat.toFixed(4)}, {location.browser_lng.toFixed(4)})
-                    </span>
-                  </div>
+                <div className="location-address">
+                  {address}
                 </div>
-                <div className="click-hint">クリックでマップ表示</div>
               </div>
             );
           })}
@@ -127,6 +107,9 @@ export const Locations: FC<LocationsProps> = ({ savedLocations }) => {
           position: relative;
           border: 1px solid #e9ecef;
           cursor: pointer;
+          min-height: 120px;
+          display: flex;
+          flex-direction: column;
         }
         
         .location-card:hover {
@@ -178,41 +161,12 @@ export const Locations: FC<LocationsProps> = ({ savedLocations }) => {
           word-break: break-word;
         }
         
-        .location-details {
-          display: flex;
-          flex-direction: column;
-          gap: 0.6rem;
-        }
-        
-        .location-item {
-          font-size: 0.9rem;
-          line-height: 1.4;
-        }
-        
-        .item-label {
-          font-weight: 600;
+        .location-address {
+          font-size: 1rem;
           color: #495057;
-          display: block;
-          margin-bottom: 0.2rem;
-        }
-        
-        .item-value {
-          color: #6c757d;
-        }
-        
-        .click-hint {
-          position: absolute;
-          bottom: 8px;
-          right: 12px;
-          font-size: 0.7rem;
-          color: #adb5bd;
-          font-style: italic;
-          opacity: 0;
-          transition: opacity 0.2s;
-        }
-        
-        .location-card:hover .click-hint {
-          opacity: 1;
+          font-weight: 500;
+          margin-top: auto;
+          padding-bottom: 0.5rem;
         }
         
         /* ハイライトパルスアニメーション */
@@ -238,6 +192,7 @@ export const Locations: FC<LocationsProps> = ({ savedLocations }) => {
           
           .location-card {
             padding: 1rem;
+            min-height: 100px;
           }
         }
         
