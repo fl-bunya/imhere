@@ -70,7 +70,7 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
           </div>
         </div>
         
-        <div className="form-group">
+        <div className="form-group message-container">
           <input 
             type="text" 
             id="message" 
@@ -79,11 +79,10 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
             maxLength={200}
             className="message-input"
           />
+          <button type="submit" className="send-button">
+            <span>📌</span>
+          </button>
         </div>
-        
-        <button type="submit" className="save-button">
-          <span className="save-icon">📌</span> 気持ちを残す
-        </button>
       </form>
 
       <script dangerouslySetInnerHTML={{
@@ -211,9 +210,16 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
           50% { transform: scale(1.2); }
         }
         
-        .message-input {
+        .message-container {
+          display: flex;
+          align-items: center;
+          gap: 10px;
           width: 100%;
-          height: 54px;
+        }
+        
+        .message-input {
+          flex: 1;
+          height: 50px;
           padding: 0.875rem 1rem;
           border: 2px solid #e0e5ec;
           border-radius: 10px;
@@ -237,37 +243,34 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
           outline: none;
         }
         
-        .save-button {
+        .send-button {
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 100%;
-          padding: 0.875rem;
+          height: 50px;
+          width: 50px;
+          min-width: 50px;
+          padding: 0;
           background: linear-gradient(135deg, #4a89dc 0%, #3a79cc 100%);
           color: white;
           border: none;
           border-radius: 10px;
-          font-size: 1.1rem;
+          font-size: 1.2rem;
           font-weight: 600;
           cursor: pointer;
           transition: all 0.3s;
           box-shadow: 0 4px 10px rgba(74,137,220,0.3);
         }
         
-        .save-button:hover {
+        .send-button:hover {
           background: linear-gradient(135deg, #3a79cc 0%, #2969bc 100%);
           transform: translateY(-2px);
           box-shadow: 0 6px 15px rgba(74,137,220,0.4);
         }
         
-        .save-button:active {
+        .send-button:active {
           transform: translateY(0);
           box-shadow: 0 2px 5px rgba(74,137,220,0.2);
-        }
-        
-        .save-icon {
-          margin-right: 8px;
-          font-size: 1.2rem;
         }
         
         @media (max-width: 576px) {
@@ -287,8 +290,14 @@ export const LocationForm: FC<LocationFormProps> = ({ currentLocation }) => {
           }
           
           .message-input {
-            height: 50px;
+            height: 45px;
             padding: 0.75rem;
+          }
+          
+          .send-button {
+            height: 45px;
+            width: 45px;
+            min-width: 45px;
           }
         }
       `}</style>
