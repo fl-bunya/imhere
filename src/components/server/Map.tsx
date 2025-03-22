@@ -26,11 +26,11 @@ export const Map: FC<MapProps> = ({ location }) => {
       <style jsx>{`
         .map-container {
           position: fixed;
-          top: 60px; /* ヘッダーの高さに合わせる */
+          top: 0;
           left: 0;
           width: 100%;
           height: 300px;
-          z-index: 250; /* headerの下、他のコンテンツの上 */
+          z-index: 250;
           box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
         #map {

@@ -29,26 +29,6 @@ export const Layout: FC<LayoutProps> = ({ children, title }) => {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            padding-top: 60px; /* ヘッダーの高さ分のパディングを追加 */
-          }
-          header {
-            background-color: #4a89dc;
-            color: white;
-            padding: 1rem;
-            text-align: center;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 300; /* 他の要素より前面に */
-            width: 100%;
-            height: 60px; /* 高さを固定 */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-          header h1 {
-            margin: 0;
-            font-size: 1.5rem;
           }
           main {
             flex-grow: 1;
@@ -75,15 +55,6 @@ export const Layout: FC<LayoutProps> = ({ children, title }) => {
             width: 100%;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
           }
-          footer {
-            background-color: #f5f7fa;
-            padding: 1rem;
-            text-align: center;
-            margin-top: auto;
-            position: relative;
-            z-index: 200;
-            width: 100%;
-          }
           
           /* モバイル用の調整 */
           @media (max-width: 480px) {
@@ -102,15 +73,9 @@ export const Layout: FC<LayoutProps> = ({ children, title }) => {
         `}</style>
       </head>
       <body>
-        <header>
-          <h1>{title}</h1>
-        </header>
         <main>
           {children}
         </main>
-        <footer>
-          <p>(c) 2025 IP Geolocation</p>
-        </footer>
       </body>
     </html>
   );
