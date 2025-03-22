@@ -13,7 +13,18 @@ function initializeMap(location) {
     }
     
     // 地図を初期化 (初期中心点は仮で最初のロケーション)
-    const map = L.map('map');
+    const map = L.map('map', {
+      // ポップアップが見切れないようにするためのオプション
+      closePopupOnClick: false,  // クリックでポップアップを閉じない
+      scrollWheelZoom: true,     // マウスホイールでズーム可能
+      zoomControl: true,         // ズームコントロールを表示
+      fadeAnimation: true,       // フェードアニメーションを有効
+      zoomAnimation: true,       // ズームアニメーションを有効
+      markerZoomAnimation: true, // マーカーズームアニメーションを有効
+      // 全体表示パディングを増やす
+      paddingTopLeft: [10, 30],   // 上下左右のパディングを追加
+      paddingBottomRight: [10, 10]
+    });
     globalMap = map; // グローバル変数に保存
     
     // タイルレイヤーを追加 (OpenStreetMap)
@@ -28,7 +39,18 @@ function initializeMap(location) {
     console.error('Error initializing map:', error);
     
     // エラー時はデフォルトの地図を表示 (東京)
-    const map = L.map('map').setView([35.6895, 139.6917], 13);
+    const map = L.map('map', {
+      // ポップアップが見切れないようにするためのオプション
+      closePopupOnClick: false,  // クリックでポップアップを閉じない
+      scrollWheelZoom: true,     // マウスホイールでズーム可能
+      zoomControl: true,         // ズームコントロールを表示
+      fadeAnimation: true,       // フェードアニメーションを有効
+      zoomAnimation: true,       // ズームアニメーションを有効
+      markerZoomAnimation: true, // マーカーズームアニメーションを有効
+      // 全体表示パディングを増やす
+      paddingTopLeft: [10, 30],   // 上下左右のパディングを追加
+      paddingBottomRight: [10, 10]
+    }).setView([35.6895, 139.6917], 13);
     globalMap = map; // グローバル変数に保存
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -80,8 +102,9 @@ function displayCurrentLocation(location) {
   // 地図の表示範囲を調整して全てのマーカーを表示
   if (bounds.isValid()) {
     globalMap.fitBounds(bounds, {
-      padding: [50, 50], // 境界から少し余白を持たせる
-      maxZoom: 15        // ズームしすぎないように制限
+      padding: [60, 60], // 境界から余白を持たせる（上下左右に60px）
+      maxZoom: 13,       // ズームしすぎないように制限（近づきすぎないように13に制限）
+      animate: true      // アニメーションを有効
     });
   } else {
     // 境界が無効な場合は東京をデフォルト表示
@@ -144,7 +167,13 @@ function displaySavedLocation(locationData) {
     const messageLatLng = locationData.browser_lat && locationData.browser_lng
       ? [locationData.browser_lat, locationData.browser_lng]
       : bounds.getCenter();
-    const messagePopup = L.popup()
+    const messagePopup = L.popup({
+      autoPan: true,               // 自動的にポップアップが見えるようにパンする
+      autoPanPadding: [50, 50],    // パン時の余白
+      minWidth: 200,               // 最小幅を設定
+      keepInView: true,            // 地図の範囲内に保持
+      closeButton: true            // 閉じるボタンを表示
+    })
       .setLatLng(messageLatLng)
       .setContent(`<div class="saved-popup"><strong>${locationData.emoji || '📍'}</strong><p>${locationData.message}</p><small>${new Date(locationData.created_at).toLocaleString('ja-JP')}</small></div>`)
       .openOn(globalMap);
@@ -163,9 +192,13 @@ function displaySavedLocation(locationData) {
   // 地図の表示範囲を調整して全てのマーカーを表示
   if (bounds.isValid()) {
     globalMap.fitBounds(bounds, {
-      padding: [50, 50], // 境界から少し余白を持たせる
-      maxZoom: 15        // ズームしすぎないように制限
+      padding: [60, 60], // 境界から余白を持たせる（上下左右に60px）
+      maxZoom: 13,       // ズームしすぎないように制限（近づきすぎないように13に制限）
+      animate: true      // アニメーションを有効
     });
+  } else {
+    // 境界が無効な場合は東京をデフォルト表示
+    globalMap.setView([35.6895, 139.6917], 13);
   }
 }
 
@@ -182,7 +215,12 @@ function createMarker(lat, lng, info, color) {
   // マーカーを追加
   const marker = L.marker([lat, lng], { icon: coloredIcon })
     .addTo(globalMap)
-    .bindPopup(info);
+    .bindPopup(info, {
+      autoPan: true,               // 自動的にポップアップが見えるようにパンする
+      autoPanPadding: [50, 50],    // パン時の余白
+      keepInView: true,            // 地図の範囲内に保持
+      offset: [0, -5]              // 少し上にオフセット
+    });
   
   return marker;
 }
@@ -194,7 +232,7 @@ function createColoredMarkerIcon(color = 'blue') {
     html: `<div style="background-color: ${color}; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 3px rgba(0,0,0,0.5);"></div>`,
     iconSize: [22, 22],
     iconAnchor: [11, 11],
-    popupAnchor: [0, -11]
+    popupAnchor: [0, 0]  // 中央を基点とし、Leafletが最適な位置を判断できるようにする
   });
 }
 
