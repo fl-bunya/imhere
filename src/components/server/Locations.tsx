@@ -20,8 +20,26 @@ export const Locations: FC<LocationsProps> = ({ savedLocations }) => {
         <div className="location-grid">
           {savedLocations.map((location, index) => {
             // 日付フォーマットの処理
-            const dateObj = new Date(location.created_at);
-            const formattedDate = `${dateObj.getFullYear()}/${(dateObj.getMonth() + 1).toString().padStart(2, '0')}/${dateObj.getDate().toString().padStart(2, '0')} ${dateObj.getHours().toString().padStart(2, '0')}:${dateObj.getMinutes().toString().padStart(2, '0')}`;
+            // JSTタイムゾーンで表示するための処理
+            function convertToJST(dateStr) {
+              // 入力: "YYYY-MM-DD HH:mm:ss" 形式
+              const date = new Date(dateStr.replace(' ', 'T') + 'Z');
+            
+              // JSTはUTC+9時間
+              const jstOffset = 9 * 60; // 分
+              const jstDate = new Date(date.getTime() + jstOffset * 60 * 1000);
+            
+              // フォーマット: "YYYY-MM-DD HH:mm:ss"
+              const year = jstDate.getFullYear();
+              const month = String(jstDate.getMonth() + 1).padStart(2, '0');
+              const day = String(jstDate.getDate()).padStart(2, '0');
+              const hours = String(jstDate.getHours()).padStart(2, '0');
+              const minutes = String(jstDate.getMinutes()).padStart(2, '0');
+              const seconds = String(jstDate.getSeconds()).padStart(2, '0');
+            
+              return `${year}/${month}/${day} ${hours}:${minutes}`;
+            }
+            const formattedDate = convertToJST(location.created_at);
             
             // 住所情報を整形
             const address = [location.browser_pref, location.browser_city, location.browser_town]

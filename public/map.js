@@ -288,13 +288,33 @@ function displaySavedLocation(locationData) {
     setTimeout(() => {
       const messageLatLng = browserPosition || (markerPositions.length > 0 ? markerPositions[0] : null);
       if (messageLatLng) {
+        // 日時をJST（日本標準時）で表示するためのフォーマット関数
+        function convertToJST(dateStr) {
+          // 入力: "YYYY-MM-DD HH:mm:ss" 形式
+          const date = new Date(dateStr.replace(' ', 'T') + 'Z');
+        
+          // JSTはUTC+9時間
+          const jstOffset = 9 * 60; // 分
+          const jstDate = new Date(date.getTime() + jstOffset * 60 * 1000);
+        
+          // フォーマット: "YYYY-MM-DD HH:mm:ss"
+          const year = jstDate.getFullYear();
+          const month = String(jstDate.getMonth() + 1).padStart(2, '0');
+          const day = String(jstDate.getDate()).padStart(2, '0');
+          const hours = String(jstDate.getHours()).padStart(2, '0');
+          const minutes = String(jstDate.getMinutes()).padStart(2, '0');
+          const seconds = String(jstDate.getSeconds()).padStart(2, '0');
+        
+          return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+        
         messagePopup = L.popup({
           autoPan: true,               // 自動的にポップアップが見えるようにパンする
           minWidth: 200,               // 最小幅を設定
           closeButton: true            // 閉じるボタンを表示
         })
           .setLatLng(messageLatLng)
-          .setContent(`<div class="saved-popup"><strong>${locationData.emoji || '📍'}</strong><p>${locationData.message}</p><small>${new Date(locationData.created_at).toLocaleString('ja-JP')}</small></div>`)
+          .setContent(`<div class="saved-popup"><strong>${locationData.emoji || '📍'}</strong><p>${locationData.message}</p><small>${convertToJST(locationData.created_at)}</small></div>`)
           .openOn(globalMap);
         
         // スタイルを追加

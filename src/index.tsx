@@ -41,7 +41,7 @@ app.get('/', async (c) => {
 
   // D1からlocationレコードを取得
   const { results } = await c.env.DB.prepare(
-    "SELECT * FROM locations ORDER BY created_at DESC LIMIT 10"
+    "SELECT * FROM locations ORDER BY created_at DESC LIMIT 300"
   ).all();
   const savedLocations = results as LocationRecord[] || [];
 
