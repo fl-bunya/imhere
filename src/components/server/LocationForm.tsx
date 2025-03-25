@@ -9,7 +9,7 @@ type LocationFormProps = {
 // 位置情報関連の人気絵文字
 const popularEmojis = [
   "👍️",
-  "🙌",
+  "👏",
   "🙏",
   "🤝",
   "🫵",
@@ -21,6 +21,7 @@ const popularEmojis = [
   "🤩",
   "😭",
   "🤮",
+  "🤔",
   "💀",
   "🎉",
   "💯",
@@ -36,7 +37,12 @@ const popularEmojis = [
   "🏢",
   "🍣",
   "🍜",
+  "🍔",
+  "🍕",
+  "🍩",
   "❓",
+  "💭",
+  "💬",
   "🗿"
 ];
 
