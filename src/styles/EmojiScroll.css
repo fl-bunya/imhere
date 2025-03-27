@@ -1,0 +1,23 @@
+.emoji-scroll-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
+  width: 100%;
+  
+  /* ハードウェアアクセラレーション */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  
+  /* スムーズな遷移 */
+  transition: transform 0.05s linear;
+}
+
+.emoji-item {
+  flex-shrink: 0;
+  font-size: 2rem;
+  
+  /* レイヤーの最適化 */
+  will-change: transform;
+  transform: translateZ(0);
+}
